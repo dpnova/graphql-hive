@@ -73,11 +73,4 @@ export const resolvers: CdnModule.Resolvers = {
       };
     },
   },
-  Query: {
-    isCDNEnabled: (_, __, { injector }) => {
-      const cdn = injector.get(CdnProvider);
-
-      return cdn.isEnabled();
-    },
-  },
 };
