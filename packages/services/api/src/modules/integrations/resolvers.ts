@@ -4,9 +4,6 @@ import { SlackIntegrationManager } from './providers/slack-integration-manager';
 
 export const resolvers: IntegrationsModule.Resolvers = {
   Query: {
-    isGitHubIntegrationFeatureEnabled(_, __, { injector }) {
-      return injector.get(GitHubIntegrationManager).isEnabled();
-    },
     organizationByGitHubInstallationId(_, { installation }, { injector }) {
       return injector.get(GitHubIntegrationManager).getOrganization({
         installation,
