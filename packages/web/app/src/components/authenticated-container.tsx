@@ -1,6 +1,10 @@
 import { ReactElement } from 'react';
-import { SessionAuth } from 'supertokens-auth-react/recipe/session';
+import Session from 'supertokens-web-js/recipe/session';
 import { HiveStripeWrapper } from '@/lib/billing/stripe';
+
+const SessionAuth = ({ children }: { children: ReactElement }) => {
+  Session.doesSessionExist();
+};
 
 /**
  * Utility for wrapping a component with an authenticated container that has the default application layout.
