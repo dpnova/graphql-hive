@@ -87,7 +87,7 @@
     "fastify": "4.28.0",
     "formik": "2.4.6",
     "framer-motion": "11.2.12",
-    "graphiql": "3.3.0",
+    "graphiql": "3.3.1",
     "graphql": "16.9.0",
     "graphql-sse": "2.5.3",
     "immer": "10.1.1",
