@@ -1,4 +1,3 @@
-import { OrganizationManager } from '../organization/providers/organization-manager';
 import { IdTranslator } from '../shared/providers/id-translator';
 import type { IntegrationsModule } from './__generated__/types';
 import { GitHubIntegrationManager } from './providers/github-integration-manager';
@@ -6,18 +5,6 @@ import { SlackIntegrationManager } from './providers/slack-integration-manager';
 
 export const resolvers: IntegrationsModule.Resolvers = {
   Mutation: {
-    async deleteGitHubIntegration(_, { input }, { injector }) {
-      const organizationId = await injector.get(IdTranslator).translateOrganizationId(input);
-
-      await injector.get(GitHubIntegrationManager).unregister({
-        organization: organizationId,
-      });
-
-      const organization = await injector.get(OrganizationManager).getOrganization({
-        organization: organizationId,
-      });
-      return { organization };
-    },
     async enableProjectNameInGithubCheck(_, { input }, { injector }) {
       const translator = injector.get(IdTranslator);
       const [organization, project] = await Promise.all([
