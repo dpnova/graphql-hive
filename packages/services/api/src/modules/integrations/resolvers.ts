@@ -1,22 +1,8 @@
-import { IdTranslator } from '../shared/providers/id-translator';
 import type { IntegrationsModule } from './__generated__/types';
 import { GitHubIntegrationManager } from './providers/github-integration-manager';
 import { SlackIntegrationManager } from './providers/slack-integration-manager';
 
 export const resolvers: IntegrationsModule.Resolvers = {
-  Mutation: {
-    async enableProjectNameInGithubCheck(_, { input }, { injector }) {
-      const translator = injector.get(IdTranslator);
-      const [organization, project] = await Promise.all([
-        translator.translateOrganizationId(input),
-        translator.translateProjectId(input),
-      ]);
-      return injector.get(GitHubIntegrationManager).enableProjectNameInGithubCheck({
-        organization,
-        project,
-      });
-    },
-  },
   Query: {
     isGitHubIntegrationFeatureEnabled(_, __, { injector }) {
       return injector.get(GitHubIntegrationManager).isEnabled();
