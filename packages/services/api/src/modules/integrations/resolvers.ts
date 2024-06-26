@@ -6,16 +6,6 @@ import { SlackIntegrationManager } from './providers/slack-integration-manager';
 
 export const resolvers: IntegrationsModule.Resolvers = {
   Mutation: {
-    async addGitHubIntegration(_, { input }, { injector }) {
-      const organization = await injector.get(IdTranslator).translateOrganizationId(input);
-
-      await injector.get(GitHubIntegrationManager).register({
-        organization,
-        installationId: input.installationId,
-      });
-
-      return true;
-    },
     async deleteGitHubIntegration(_, { input }, { injector }) {
       const organizationId = await injector.get(IdTranslator).translateOrganizationId(input);
 
