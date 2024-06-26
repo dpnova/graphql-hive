@@ -28,9 +28,4 @@ export const resolvers: IntegrationsModule.Resolvers = {
       };
     },
   },
-  Project: {
-    isProjectNameInGitHubCheckEnabled(project) {
-      return project.useProjectNameInGithubCheck;
-    },
-  },
 };
