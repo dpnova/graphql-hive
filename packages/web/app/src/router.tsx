@@ -12,6 +12,7 @@ import { env } from '@/env/frontend';
 import * as gtag from '@/lib/gtag';
 import { urqlClient } from '@/lib/urql';
 import { configureScope, init } from '@sentry/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   createRootRoute,
   createRoute,
@@ -73,6 +74,8 @@ if (globalThis.window) {
   }
 }
 
+const queryClient = new QueryClient();
+
 const LazyTanStackRouterDevtools = lazy(() =>
   import('@tanstack/router-devtools').then(({ TanStackRouterDevtools }) => ({
     default: TanStackRouterDevtools,
@@ -116,13 +119,15 @@ function RootComponent() {
           />
         </Helmet>
       )}
-      <SuperTokensWrapper>
-        <UrqlProvider value={urqlClient}>
-          <LoadingAPIIndicator />
-          <Outlet />
-        </UrqlProvider>
-      </SuperTokensWrapper>
       <Toaster />
+      <SuperTokensWrapper>
+        <QueryClientProvider client={queryClient}>
+          <UrqlProvider value={urqlClient}>
+            <LoadingAPIIndicator />
+            <Outlet />
+          </UrqlProvider>
+        </QueryClientProvider>
+      </SuperTokensWrapper>
       <ToastContainer hideProgressBar />
       {/* eslint-disable-next-line no-process-env */}
       {process.env.NODE_ENV === 'development' && <LazyTanStackRouterDevtools />}

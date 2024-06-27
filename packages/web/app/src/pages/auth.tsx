@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { FaGithub, FaGoogle, FaRegUserCircle } from 'react-icons/fa';
+import { FaGithub, FaGoogle } from 'react-icons/fa';
+import { SignInForm } from '@/components/auth/sign-in';
 import { FullLogo } from '@/components/common/Logo';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -168,64 +169,6 @@ export function AuthPage() {
         </DottedBackground>
       )}
     </div>
-  );
-}
-
-function SignInForm(props: { onSignUp(): void }) {
-  return (
-    <Card className="mx-auto w-full max-w-sm bg-[#101014]">
-      <CardHeader>
-        <div className="flex flex-row items-center justify-between">
-          <div className="space-y-1.5">
-            <CardTitle className="text-2xl">Login</CardTitle>
-            <CardDescription>Sign in to your account</CardDescription>
-          </div>
-          <div>
-            <HiveLogo animated={false} />
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="m@example.com" required />
-          </div>
-          <div className="grid gap-2">
-            <div className="flex items-center">
-              <Label htmlFor="password">Password</Label>
-              <Link href="#" className="ml-auto inline-block text-sm underline">
-                Forgot your password?
-              </Link>
-            </div>
-            <Input id="password" type="password" required />
-          </div>
-          <Button type="submit" className="w-full">
-            Login
-          </Button>
-          <div className="flex flex-row items-center justify-between gap-x-4">
-            <div className="h-[1px] w-full bg-gray-700" />
-            <div className="text-center text-gray-400">or</div>
-            <div className="h-[1px] w-full bg-gray-700" />
-          </div>
-          <Button variant="outline" className="w-full">
-            <FaGoogle className="mr-4 size-4" /> Login with Google
-          </Button>
-          <Button variant="outline" className="w-full">
-            <FaGithub className="mr-4 size-4" /> Login with Github
-          </Button>
-          <Button variant="outline" className="w-full">
-            <FaRegUserCircle className="mr-4 size-4" /> Login with SSO
-          </Button>
-        </div>
-        <div className="mt-4 text-center text-sm">
-          Don't have an account?{' '}
-          <Link href="#" className="underline" onClick={props.onSignUp}>
-            Sign up
-          </Link>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
 
