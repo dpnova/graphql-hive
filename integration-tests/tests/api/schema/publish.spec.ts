@@ -2820,7 +2820,7 @@ test('Target.schemaVersion: result is read from the database', async () => {
 
 test('Composition Error (Federation 2) can be served from the database', async () => {
   const storage = await createStorage(connectionString(), 1);
-  const serviceAddress = await getServiceHost('external_composition', 3069);
+  const serviceAddress = await getServiceHost('composition_federation_2', 3069);
 
   try {
     const initialSchema = /* GraphQL */ `
@@ -2950,7 +2950,7 @@ test('Composition Error (Federation 2) can be served from the database', async (
 
 test('Composition Network Failure (Federation 2)', async () => {
   const storage = await createStorage(connectionString(), 1);
-  const serviceAddress = await getServiceHost('external_composition', 3069);
+  const serviceAddress = await getServiceHost('composition_federation_2', 3069);
 
   try {
     const initialSchema = /* GraphQL */ `
