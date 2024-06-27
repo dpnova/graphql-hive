@@ -94,6 +94,7 @@ export function SignInForm(props: { onSignUp(): void }) {
           message: field.error,
         });
       });
+      break;
     }
     case 'SIGN_IN_NOT_ALLOWED': {
       toast({
@@ -101,6 +102,7 @@ export function SignInForm(props: { onSignUp(): void }) {
         description: 'Please contact support for assistance.',
         variant: 'destructive',
       });
+      break;
     }
   }
 
