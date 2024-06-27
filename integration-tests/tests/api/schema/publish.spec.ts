@@ -2820,7 +2820,7 @@ test('Target.schemaVersion: result is read from the database', async () => {
 
 test('Composition Error (Federation 2) can be served from the database', async () => {
   const storage = await createStorage(connectionString(), 1);
-  const serviceAddress = getServiceHost('external_composition', 3069);
+  const serviceAddress = await getServiceHost('external_composition', 3069);
 
   try {
     const initialSchema = /* GraphQL */ `
@@ -2936,8 +2936,13 @@ test('Composition Error (Federation 2) can be served from the database', async (
       authToken: ownerToken,
     }).then(res => res.expectNoGraphQLErrors());
 
-    expect(result?.target?.schemaVersion?.schemaCompositionErrors?.nodes.length).toBe(1);
-    expect(result?.target?.schemaVersion?.schemaCompositionErrors?.nodes[0].message).toContain('[test] Product -> A @key selects IDONOTEXIST, but Product.IDONOTEXIST could not be found');
+    expect(result?.target?.schemaVersion?.schemaCompositionErrors?.nodes).toMatchInlineSnapshot(`
+      [
+        {
+          message: [test] On type "Product", for @key(fields: "IDONOTEXIST"): Cannot query field "IDONOTEXIST" on type "Product" (the field should either be added to this subgraph or, if it should not be resolved by this subgraph, you need to add it to this subgraph with @external).,
+        },
+      ]
+    `);
   } finally {
     await storage.destroy();
   }
@@ -2945,7 +2950,7 @@ test('Composition Error (Federation 2) can be served from the database', async (
 
 test('Composition Network Failure (Federation 2)', async () => {
   const storage = await createStorage(connectionString(), 1);
-  const serviceAddress = getServiceHost('external_composition', 3069);
+  const serviceAddress = await getServiceHost('external_composition', 3069);
 
   try {
     const initialSchema = /* GraphQL */ `

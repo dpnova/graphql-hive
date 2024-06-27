@@ -15,7 +15,7 @@ const LOCAL_SERVICES = {
   server: 3001,
   clickhouse: 8123,
   emails: 6260,
-  external_composition: 3069,
+  external_composition: 3012,
   usage: 4001,
 } as const;
 
