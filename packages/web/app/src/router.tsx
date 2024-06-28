@@ -4,7 +4,7 @@ import { ToastContainer } from 'react-toastify';
 import SuperTokens, { SuperTokensWrapper } from 'supertokens-auth-react';
 import Session from 'supertokens-auth-react/recipe/session';
 import { Provider as UrqlProvider } from 'urql';
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
 import { LoadingAPIIndicator } from '@/components/common/LoadingAPI';
 import { Toaster } from '@/components/ui/toaster';
 import { frontendConfig } from '@/config/supertokens/frontend';
@@ -26,6 +26,7 @@ import { NotFound } from './components/not-found';
 import 'react-toastify/dist/ReactToastify.css';
 import { authenticated } from './components/authenticated-container';
 import { AuthPage } from './pages/auth';
+import { AuthOIDCPage } from './pages/auth-oidc';
 import { AuthResetPasswordPage } from './pages/auth-reset-password';
 import { AuthSignInPage } from './pages/auth-sign-in';
 import { AuthSignUpPage } from './pages/auth-sign-up';
@@ -221,6 +222,25 @@ const authSSORoute = createRoute({
   component: () => {
     const { redirectToPath } = authSSORoute.useSearch();
     return <AuthSSOPage redirectToPath={redirectToPath} />;
+  },
+});
+
+const AuthOIDCRouteSearch = z.object({
+  id: z
+    .string({
+      required_error: 'OIDC ID is required',
+    })
+    .optional(),
+});
+const authOIDCRoute = createRoute({
+  getParentRoute: () => authRoute,
+  path: 'oidc',
+  validateSearch(search) {
+    return AuthOIDCRouteSearch.parse(search);
+  },
+  component: function AuthOIDCRoute() {
+    const { id } = authOIDCRoute.useSearch();
+    return <AuthOIDCPage oidcId={id} />;
   },
 });
 
@@ -707,6 +727,7 @@ const routeTree = root.addChildren([
       authSignInRoute,
       authSignUpRoute,
       authSSORoute,
+      authOIDCRoute,
       authVerifyEmailRoute,
     ]),
   ]),

@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 import { useForm } from 'react-hook-form';
-import { FaGithub, FaGoogle, FaRegUserCircle } from 'react-icons/fa';
 import { useSessionContext } from 'supertokens-auth-react/recipe/session';
 import { emailPasswordSignIn } from 'supertokens-auth-react/recipe/thirdpartyemailpassword';
 import z from 'zod';
