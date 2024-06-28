@@ -1,7 +1,8 @@
 import { useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaGithub, FaGoogle, FaRegUserCircle } from 'react-icons/fa';
-import { emailPasswordSignIn as superSignIn } from 'supertokens-auth-react/recipe/thirdpartyemailpassword';
+import { useSessionContext } from 'supertokens-auth-react/recipe/session';
+import { emailPasswordSignIn } from 'supertokens-auth-react/recipe/thirdpartyemailpassword';
 import z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,9 +17,10 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { HiveLogo } from '@/components/v2/icon';
+import { exhaustiveGuard } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { Link, useLocation, useRouter } from '@tanstack/react-router';
+import { Link, Navigate, useRouter } from '@tanstack/react-router';
 
 const SignInFormSchema = z.object({
   email: z
@@ -31,9 +33,58 @@ const SignInFormSchema = z.object({
 
 type SignInFormValues = z.infer<typeof SignInFormSchema>;
 
-export function SignInForm(props: { onSignUp(): void }) {
+export function AuthSignInPage(props: { redirectToPath?: string }) {
+  const session = useSessionContext();
+  const router = useRouter();
   const signIn = useMutation({
-    mutationFn: superSignIn,
+    mutationFn: emailPasswordSignIn,
+    onSuccess(data) {
+      const status = data.status;
+
+      switch (status) {
+        case 'OK': {
+          router.navigate({
+            to: props.redirectToPath,
+          });
+          break;
+        }
+        case 'WRONG_CREDENTIALS_ERROR': {
+          toast({
+            title: 'Invalid email or password',
+            description: 'Please check your email and password and try again.',
+            variant: 'destructive',
+          });
+          break;
+        }
+        case 'FIELD_ERROR': {
+          data.formFields.forEach(field => {
+            form.setError(field.id as keyof SignInFormValues, {
+              type: 'manual',
+              message: field.error,
+            });
+          });
+          break;
+        }
+        case 'SIGN_IN_NOT_ALLOWED': {
+          toast({
+            title: 'Sign in not allowed',
+            description: 'Please contact support for assistance.',
+            variant: 'destructive',
+          });
+          break;
+        }
+        default: {
+          exhaustiveGuard(status);
+        }
+      }
+    },
+    onError(error) {
+      toast({
+        title: 'An error occurred',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
   });
   const form = useForm({
     mode: 'onSubmit',
@@ -65,49 +116,18 @@ export function SignInForm(props: { onSignUp(): void }) {
     [signIn.mutate],
   );
 
-  const router = useRouter();
-  const loc = useLocation();
-  const redirectToPath =
-    'redirectToPath' in loc.search && typeof loc.search.redirectToPath === 'string'
-      ? loc.search.redirectToPath || '/'
-      : '/';
+  if (session.loading) {
+    // AuthPage component already shows a loading state
+    return null;
+  }
 
-  switch (signIn.data?.status) {
-    case 'OK': {
-      router.navigate({
-        to: redirectToPath,
-      });
-      break;
-    }
-    case 'WRONG_CREDENTIALS_ERROR': {
-      toast({
-        title: 'Invalid email or password',
-        description: 'Please check your email and password and try again.',
-        variant: 'destructive',
-      });
-      break;
-    }
-    case 'FIELD_ERROR': {
-      signIn.data.formFields.forEach(field => {
-        form.setError(field.id as 'email' | 'password', {
-          type: 'manual',
-          message: field.error,
-        });
-      });
-      break;
-    }
-    case 'SIGN_IN_NOT_ALLOWED': {
-      toast({
-        title: 'Sign in not allowed',
-        description: 'Please contact support for assistance.',
-        variant: 'destructive',
-      });
-      break;
-    }
+  if (session.doesSessionExist) {
+    // Redirect to the home page if the user is already signed in
+    return <Navigate to="/" />;
   }
 
   return (
-    <Card className="mx-auto w-full max-w-sm bg-[#101014]">
+    <Card className="mx-auto w-full max-w-md bg-[#101014]">
       <CardHeader>
         <div className="flex flex-row items-center justify-between">
           <div className="space-y-1.5">
@@ -145,7 +165,8 @@ export function SignInForm(props: { onSignUp(): void }) {
                       <FormLabel>Password</FormLabel>
                       <Link
                         tabIndex={-1}
-                        href="#"
+                        to="/auth/reset-password"
+                        search={{ email: form.getValues().email || undefined }}
                         className="ml-auto inline-block text-sm underline"
                       >
                         Forgot your password?
@@ -172,19 +193,24 @@ export function SignInForm(props: { onSignUp(): void }) {
             <div className="text-center text-gray-400">or</div>
             <div className="h-[1px] w-full bg-gray-700" />
           </div>
-          <Button variant="outline" className="w-full">
+          {/* TODO: Google */}
+          <Button variant="outline" className="w-full" disabled={signIn.isPending}>
             <FaGoogle className="mr-4 size-4" /> Login with Google
           </Button>
-          <Button variant="outline" className="w-full">
+          {/* TODO: Github */}
+          <Button variant="outline" className="w-full" disabled={signIn.isPending}>
             <FaGithub className="mr-4 size-4" /> Login with Github
           </Button>
-          <Button variant="outline" className="w-full">
-            <FaRegUserCircle className="mr-4 size-4" /> Login with SSO
+          {/* TODO: https://github.com/kamilkisiela/graphql-hive/issues/4367 */}
+          <Button asChild variant="outline" className="w-full" disabled={signIn.isPending}>
+            <Link to="/auth/sso">
+              <FaRegUserCircle className="mr-4 size-4" /> Login with SSO
+            </Link>
           </Button>
         </div>
         <div className="mt-4 text-center text-sm">
           Don't have an account?{' '}
-          <Link href="#" className="underline" onClick={props.onSignUp}>
+          <Link to="/auth/sign-up" data-auth-link="sign-up" className="underline">
             Sign up
           </Link>
         </div>

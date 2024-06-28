@@ -50,6 +50,23 @@ export const frontendConfig = () => {
       ThirdPartyEmailPasswordReact.init({
         signInAndUpFeature: {
           providers,
+          signUpForm: {
+            formFields: [
+              {
+                id: 'firstName',
+                label: 'First Name',
+                placeholder: 'First Name',
+                // optional because of OIDC integration
+                optional: true,
+              },
+              {
+                id: 'lastName',
+                label: 'Last Name',
+                placeholder: 'Last Name',
+                optional: true,
+              },
+            ],
+          },
         },
         async getRedirectionURL(context) {
           if (context.action === 'SUCCESS') {

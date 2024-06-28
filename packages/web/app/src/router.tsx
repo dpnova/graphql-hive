@@ -26,6 +26,11 @@ import { NotFound } from './components/not-found';
 import 'react-toastify/dist/ReactToastify.css';
 import { authenticated } from './components/authenticated-container';
 import { AuthPage } from './pages/auth';
+import { AuthResetPasswordPage } from './pages/auth-reset-password';
+import { AuthSignInPage } from './pages/auth-sign-in';
+import { AuthSignUpPage } from './pages/auth-sign-up';
+import { AuthSSOPage } from './pages/auth-sso';
+import { AuthVerifyEmailPage } from './pages/auth-verify-email';
 import { DevPage } from './pages/dev';
 import { IndexPage } from './pages/index';
 import { LogoutPage } from './pages/logout';
@@ -161,6 +166,74 @@ const authRoute = createRoute({
   component: AuthPage,
   notFoundComponent: NotFound,
   errorComponent: ErrorComponent,
+});
+
+const AuthIndexRouteSearch = z.object({
+  redirectToPath: z.string().optional(),
+});
+
+const authIndexRoute = createRoute({
+  getParentRoute: () => authRoute,
+  path: '/',
+  validateSearch(search) {
+    return AuthIndexRouteSearch.parse(search);
+  },
+  component: () => {
+    const { redirectToPath } = authIndexRoute.useSearch();
+    return <Navigate to="/auth/sign-in" search={{ redirectToPath }} />;
+  },
+});
+
+const AuthResetPasswordRouteSearch = z.object({
+  email: z.string().optional(),
+});
+
+const authResetPasswordRoute = createRoute({
+  getParentRoute: () => authRoute,
+  path: 'reset-password',
+  validateSearch(search) {
+    return AuthResetPasswordRouteSearch.parse(search);
+  },
+  component: function AuthResetPasswordRoute() {
+    const { email } = authResetPasswordRoute.useSearch();
+    return <AuthResetPasswordPage email={email ?? null} />;
+  },
+});
+
+const authSignInRoute = createRoute({
+  getParentRoute: () => authRoute,
+  path: 'sign-in',
+  validateSearch(search) {
+    return AuthIndexRouteSearch.parse(search);
+  },
+  component: () => {
+    const { redirectToPath } = authSignInRoute.useSearch();
+    return <AuthSignInPage redirectToPath={redirectToPath} />;
+  },
+});
+
+const authSSORoute = createRoute({
+  getParentRoute: () => authRoute,
+  path: 'sso',
+  validateSearch(search) {
+    return AuthIndexRouteSearch.parse(search);
+  },
+  component: () => {
+    const { redirectToPath } = authSSORoute.useSearch();
+    return <AuthSSOPage redirectToPath={redirectToPath} />;
+  },
+});
+
+const authSignUpRoute = createRoute({
+  getParentRoute: () => authRoute,
+  path: 'sign-up',
+  component: AuthSignUpPage,
+});
+
+const authVerifyEmailRoute = createRoute({
+  getParentRoute: () => authRoute,
+  path: 'verify-email',
+  component: AuthVerifyEmailPage,
 });
 
 const indexRoute = createRoute({
@@ -629,7 +702,12 @@ const routeTree = root.addChildren([
   notFoundRoute,
   anonymousRoute.addChildren([
     authRoute.addChildren([
-      /* I have no idea why (yet), but this is necessary to make /auth/reset-password page works */
+      authIndexRoute,
+      authResetPasswordRoute,
+      authSignInRoute,
+      authSignUpRoute,
+      authSSORoute,
+      authVerifyEmailRoute,
     ]),
   ]),
   authenticatedRoute.addChildren([

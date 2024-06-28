@@ -119,6 +119,19 @@ export const backendConfig = (requirements: {
     recipeList: [
       ThirdPartyEmailPasswordNode.init({
         providers,
+        signUpFeature: {
+          formFields: [
+            {
+              id: 'firstName',
+              // optional because of OIDC integration
+              optional: true,
+            },
+            {
+              id: 'lastName',
+              optional: true,
+            },
+          ],
+        },
         emailDelivery: {
           override: originalImplementation => ({
             ...originalImplementation,
@@ -219,13 +232,19 @@ const getEnsureUserOverrides = (
         throw Error('emailPasswordSignUpPOST is not available');
       }
 
+      console.log(input.formFields);
       const response = await originalImplementation.emailPasswordSignUpPOST(input);
+
+      const firstName = input.formFields.find(field => field.id === 'firstName')?.value ?? null;
+      const lastName = input.formFields.find(field => field.id === 'lastName')?.value ?? null;
 
       if (response.status === 'OK') {
         await internalApi.ensureUser({
           superTokensUserId: response.user.id,
           email: response.user.email,
           oidcIntegrationId: null,
+          firstName,
+          lastName,
         });
       }
 
@@ -243,6 +262,9 @@ const getEnsureUserOverrides = (
           superTokensUserId: response.user.id,
           email: response.user.email,
           oidcIntegrationId: null,
+          // They are not available during sign in.
+          firstName: null,
+          lastName: null,
         });
       }
 
@@ -262,7 +284,6 @@ const getEnsureUserOverrides = (
         }
         return null;
       }
-
       const response = await originalImplementation.thirdPartySignInUpPOST(input);
 
       if (response.status === 'OK') {
@@ -270,6 +291,9 @@ const getEnsureUserOverrides = (
           superTokensUserId: response.user.id,
           email: response.user.email,
           oidcIntegrationId: extractOidcId(input),
+          // TODO: should we somehow extract the first and last name from the third party provider?
+          firstName: null,
+          lastName: null,
         });
       }
 

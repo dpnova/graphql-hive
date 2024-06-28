@@ -80,6 +80,8 @@ export interface Storage {
       id: string;
       defaultScopes: Array<OrganizationAccessScope | ProjectAccessScope | TargetAccessScope>;
     };
+    firstName: string | null;
+    lastName: string | null;
   }): Promise<'created' | 'no_action'>;
 
   getUserBySuperTokenId(_: { superTokensUserId: string }): Promise<User | null>;

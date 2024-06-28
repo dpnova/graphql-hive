@@ -731,15 +731,20 @@ export async function createStorage(
     email: string;
     externalAuthUserId: string | null;
     oidcIntegrationId: string | null;
+    firstName: string | null;
+    lastName: string | null;
   }) {
-    const displayName = input.email.split('@')[0].slice(0, 25).padEnd(2, '1');
-    const fullName = input.email.split('@')[0].slice(0, 25).padEnd(2, '1');
+    const { firstName, lastName } = input;
+    const name =
+      firstName && lastName
+        ? `${firstName} ${lastName}`
+        : input.email.split('@')[0].slice(0, 25).padEnd(2, '1');
 
     return {
       superTokensUserId: input.superTokensUserId,
       email: input.email,
-      displayName,
-      fullName,
+      displayName: name,
+      fullName: name,
       externalAuthUserId: input.externalAuthUserId,
       oidcIntegrationId: input.oidcIntegrationId,
     };
@@ -762,9 +767,13 @@ export async function createStorage(
       externalAuthUserId,
       email,
       oidcIntegration,
+      firstName,
+      lastName,
     }: {
       superTokensUserId: string;
       externalAuthUserId?: string | null;
+      firstName: string | null;
+      lastName: string | null;
       email: string;
       oidcIntegration: null | {
         id: string;
@@ -781,6 +790,8 @@ export async function createStorage(
               email,
               externalAuthUserId: externalAuthUserId ?? null,
               oidcIntegrationId: oidcIntegration?.id ?? null,
+              firstName,
+              lastName,
             }),
             t,
           );
