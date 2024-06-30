@@ -10,6 +10,7 @@ const config: CodegenConfig = {
     './packages/services/api/src': defineConfig(
       {
         typeDefsFilePath: false,
+        mergeSchema: false, // TODO: temporarily disable merging schema to avoid this keeps popping up every time we run codegen. eddeee888 to remove schema-ast plugin and re-enable this.
         resolverGeneration: 'minimal',
         resolverMainFileMode: 'modules',
         resolverTypesPath: './__generated__/types.next.ts',
