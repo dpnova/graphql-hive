@@ -3,7 +3,7 @@ import { SupportManager } from '../../providers/support-manager';
 import type { MutationResolvers } from './../../../../__generated__/types.next';
 
 export const supportTicketReply: NonNullable<MutationResolvers['supportTicketReply']> = async (
-  _parent,
+  _,
   { input },
   { injector },
 ) => {
